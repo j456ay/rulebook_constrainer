@@ -184,10 +184,3 @@ ros2 topic list | grep rule_mask
 ros2 param list | grep rulebook_constrainer
 ```
 
-## TurtleBot3 Waffle Pi 권장 파라미터
-
-```yaml
-robot_footprint_radius: 0.22  # 로봇 반경 (m)
-mask_resolution: 0.05         # 지도 해상도와 동일하게 설정
-publish_rate_hz: 1.0          # 마스크 갱신 빈도
-```

@@ -136,38 +136,31 @@ if response.success:
 ## YAML 규칙서 형식
 
 ```yaml
-# example_rulebook.yaml
 map_frame: "map"
-rules:
-  keepout_zones:
-    - type: "polygon"
-      name: "exhibition_area"
-      coordinates: [[1.0, 1.0], [3.0, 1.0], [3.0, 3.0], [1.0, 3.0]]
-      reason: "박물관 전시 앞"
-    - type: "circle"
-      name: "emergency_exit"
-      center: [5.0, 5.0]
-      radius: 1.5
-      reason: "비상구 확보"
-  
-  speed_zones:
-    - type: "polygon"
-      name: "school_zone"
-      coordinates: [[10.0, 10.0], [15.0, 10.0], [15.0, 15.0], [10.0, 15.0]]
-      max_speed: 0.3
-      reason: "학교 앞 저속 구역"
-  
-  lane_preferences:
-    - type: "line"
-      name: "main_corridor"
-      start: [0.0, 0.0]
-      end: [20.0, 0.0]
-      preference: "right"
-      reason: "복도 우측통행"
 
+# (선택) 기저 랜드마크: 일부만 좌표로 유지
 landmarks:
   museum_entrance: [2.0, 2.0]
   school_gate: [12.5, 12.5]
+
+# 새 섹션: 자연어 규칙(좌표 없음/모호 가능)
+semantic_rules:
+  - id: "slow_museum"
+    intent: "speed_limit"
+    text: "박물관 입구 주변은 서행(0.25 m/s)으로 이동해."
+    fallback:
+      near: "museum_entrance"
+      radius_m: 3.0
+
+  - id: "keepout_exhibit"
+    intent: "keepout"
+    text: "전시 구역은 들어가지 마."
+    # 좌표가 전혀 없으면 LLM이 지도로부터 추정(없으면 no-op)
+
+  - id: "lane_main_corridor"
+    intent: "lane_preference"
+    text: "메인 복도는 우측통행"
+
 ```
 
 ## 테스트 및 검증

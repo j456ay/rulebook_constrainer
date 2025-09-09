@@ -110,12 +110,12 @@ global_costmap:
         base_speed_to_max_speed_ratio: 0.2
 ```
 
-## 프레임워크 A (LLM) 통합
+## 프레임워크 llm_candidate_planner_core 통합
 
 LLM 경로 계획기에서 규칙 정보를 사용하려면:
 
 ```python
-# 프레임워크 A에서 사용 예시
+# 프레임워크 "llm_candidate_planner_core"에서 사용 예시
 import rclpy
 from std_srvs.srv import Trigger
 

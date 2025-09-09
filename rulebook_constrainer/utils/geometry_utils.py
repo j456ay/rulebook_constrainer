@@ -91,4 +91,57 @@ class GeometryUtils:
     @staticmethod
     def map_to_world_coordinates(map_x: int, map_y: int,
                                 origin_x: float, origin_y: float, resolution: float) -> Tuple[float, float]:
-        """맵 픽셀 좌표를 월드 좌표로 변환
+        """맵 픽셀 좌표를 월드 좌표로 변환"""
+        try:
+            world_x = origin_x + (map_x + 0.5) * resolution
+            world_y = origin_y + (map_y + 0.5) * resolution
+            return world_x, world_y
+        except Exception:
+            return 0.0, 0.0
+    
+    @staticmethod
+    def validate_polygon(polygon: List[Tuple[float, float]]) -> bool:
+        """폴리곤이 유효한지 확인"""
+        try:
+            if len(polygon) < 3:
+                return False
+            shapely_polygon = ShapelyPolygon(polygon)
+            return shapely_polygon.is_valid
+        except Exception:
+            return False
+    
+    @staticmethod
+    def calculate_polygon_area(polygon: List[Tuple[float, float]]) -> float:
+        """폴리곤 면적 계산"""
+        try:
+            shapely_polygon = ShapelyPolygon(polygon)
+            return shapely_polygon.area
+        except Exception:
+            return 0.0
+    
+    @staticmethod
+    def get_polygon_centroid(polygon: List[Tuple[float, float]]) -> Tuple[float, float]:
+        """폴리곤 중심점 계산"""
+        try:
+            shapely_polygon = ShapelyPolygon(polygon)
+            centroid = shapely_polygon.centroid
+            return (float(centroid.x), float(centroid.y))
+        except Exception:
+            # 실패 시 단순 평균 계산
+            if polygon:
+                avg_x = sum(p[0] for p in polygon) / len(polygon)
+                avg_y = sum(p[1] for p in polygon) / len(polygon)
+                return (avg_x, avg_y)
+            return (0.0, 0.0)
+    
+    @staticmethod
+    def clip_coordinates_to_bounds(coords: List[Tuple[float, float]], 
+                                  min_x: float, min_y: float, 
+                                  max_x: float, max_y: float) -> List[Tuple[float, float]]:
+        """좌표를 지정된 경계 내로 클리핑"""
+        clipped = []
+        for x, y in coords:
+            clipped_x = max(min_x, min(max_x, x))
+            clipped_y = max(min_y, min(max_y, y))
+            clipped.append((clipped_x, clipped_y))
+        return clipped

@@ -1,0 +1,124 @@
+# Example Rulebook for TurtleBot3 Navigation
+# 좌표는 map 프레임 기준 (미터)
+
+map_frame: "map"
+robot_frame: "base_footprint"
+
+# 랜드마크 정의 (좌표 참조용)
+landmarks:
+  museum_entrance: [2.0, 2.0]
+  school_gate: [12.5, 12.5]
+  emergency_exit: [5.0, 5.0]
+  main_corridor_start: [0.0, 0.0]
+  main_corridor_end: [20.0, 0.0]
+
+# 규칙 정의
+rules:
+  # Keepout 영역 (진입 금지)
+  keepout_zones:
+    - type: "polygon"
+      name: "exhibition_area"
+      coordinates: 
+        - [1.0, 1.0]
+        - [3.0, 1.0] 
+        - [3.0, 3.0]
+        - [1.0, 3.0]
+      reason: "박물관 전시 앞 - 관람객 방해 금지"
+      priority: "high"
+      
+    - type: "circle" 
+      name: "emergency_exit_zone"
+      center: [5.0, 5.0]  # 또는 landmark: "emergency_exit"
+      radius: 1.5
+      reason: "비상구 확보 - 법적 요구사항"
+      priority: "critical"
+      
+    - type: "polygon"
+      name: "fragile_equipment"
+      coordinates:
+        - [8.0, 8.0]
+        - [10.0, 8.0]
+        - [10.0, 10.0] 
+        - [8.0, 10.0]
+      reason: "정밀 장비 보호"
+      priority: "medium"
+
+  # 속도 제한 영역
+  speed_zones:
+    - type: "polygon"
+      name: "school_zone"
+      coordinates:
+        - [10.0, 10.0]
+        - [15.0, 10.0]
+        - [15.0, 15.0]
+        - [10.0, 15.0]
+      max_speed: 0.3  # m/s
+      reason: "학교 앞 저속 구역 - 안전 확보"
+      priority: "high"
+      
+    - type: "circle"
+      name: "crowd_area" 
+      center: [18.0, 18.0]
+      radius: 2.0
+      max_speed: 0.2  # m/s
+      reason: "사람 많은 지역 - 충돌 방지"
+      priority: "medium"
+      
+    - type: "polygon"
+      name: "narrow_passage"
+      coordinates:
+        - [6.0, 0.0]
+        - [8.0, 0.0]
+        - [8.0, 5.0]
+        - [6.0, 5.0]
+      max_speed: 0.4  # m/s  
+      reason: "좁은 통로 - 조심 운행"
+      priority: "low"
+
+  # 차선 선호도
+  lane_preferences:
+    - type: "line"
+      name: "main_corridor"
+      start: [0.0, 0.0]
+      end: [20.0, 0.0]
+      width: 2.0  # 차선 폭
+      preference: "right"
+      reason: "복도 우측통행 - 교통 질서"
+      priority: "medium"
+      
+    - type: "line" 
+      name: "secondary_hallway"
+      start: [5.0, 5.0]
+      end: [5.0, 15.0]
+      width: 1.5
+      preference: "left"
+      reason: "보조 통로 좌측 선호"
+      priority: "low"
+
+  # 특별 지시사항
+  special_instructions:
+    - zone_name: "exhibition_area"
+      instruction: "전시 관람 중인 관람객이 있을 경우 우회 경로 사용"
+      condition: "visitor_present"
+      
+    - zone_name: "emergency_exit_zone"
+      instruction: "비상 상황 발생 시 즉시 경로에서 벗어나기"
+      condition: "emergency_active"
+
+# 시간대별 규칙 (선택사항)
+time_based_rules:
+  - time_range: "09:00-17:00"  # 운영시간
+    apply_rules: ["school_zone", "exhibition_area"]
+    reason: "운영 시간 중 특별 관리"
+    
+  - time_range: "17:00-09:00"  # 비운영시간
+    relax_rules: ["crowd_area"]
+    reason: "야간 시간 - 관람객 없음"
+
+# 메타데이터
+metadata:
+  version: "1.0"
+  created_date: "2025-01-15"
+  author: "Robot SW Engineer"
+  description: "TurtleBot3 박물관/학교 환경용 기본 규칙서"
+  last_modified: "2025-01-15"
